@@ -12,6 +12,11 @@ Welcome to my personal repository of **n8n workflows**. This repository contains
 - **n8n** (Node-based Workflow Automation)
 - **JavaScript** (For custom code nodes and duration parsing)
 - **Google Sheets API & Gmail API**
+- My First Workflow:
+- <img width="899" height="437" alt="image" src="https://github.com/user-attachments/assets/84ac493e-dd70-4f33-af10-570b60f5a222" />
+ My Second Workflow:
+<img width="915" height="439" alt="image" src="https://github.com/user-attachments/assets/9c98fe28-015a-4062-8cec-e753dd24a639" />
+My third Workflow:
 - <img width="907" height="445" alt="image" src="https://github.com/user-attachments/assets/73a6864c-53ff-47cd-b9b9-f01ceca3c143" />
 
 
