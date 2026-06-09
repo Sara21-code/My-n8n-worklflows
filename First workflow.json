@@ -1,0 +1,330 @@
+{
+  "name": "First workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Test-form for feedback",
+        "formDescription": "Getting feeedback for product X from costumer",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Email_ID",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Name",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Age",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "feedback",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "positive"
+                  },
+                  {
+                    "option": "negative"
+                  },
+                  {
+                    "option": "normal"
+                  }
+                ]
+              },
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.5,
+      "position": [
+        -208,
+        0
+      ],
+      "id": "6bf6d631-dc8e-49a8-a2e8-f6221cb7f4f5",
+      "name": "On form submission",
+      "webhookId": "97168ccd-6a99-4e75-a2a6-48c10aaae5e8"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1QpWQuNPdetPX4k1aNqKTrqaGQ6rk9fF-FhL9d9gSDwk",
+          "mode": "list",
+          "cachedResultName": "DATA",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1QpWQuNPdetPX4k1aNqKTrqaGQ6rk9fF-FhL9d9gSDwk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1QpWQuNPdetPX4k1aNqKTrqaGQ6rk9fF-FhL9d9gSDwk/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Email_ID": "={{ $json.Email_ID }}",
+            "Name": "={{ $json.Name }}",
+            "Age": "={{ $json.Age }}",
+            "feedback": "={{ $json.feedback }}",
+            "give_discount": "={{ $json.give_discount }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Email_ID",
+              "displayName": "Email_ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Age",
+              "displayName": "Age",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "feedback",
+              "displayName": "feedback",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "give_discount",
+              "displayName": "give_discount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        592,
+        16
+      ],
+      "id": "517b62c8-7656-4049-8ec6-1b5565cc708c",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "PibXpfz1x76dNblg",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "0ccab15f-63d4-40bf-ab7d-88ad051e0d14",
+              "leftValue": "={{ $json.feedback }}",
+              "rightValue": "positive",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        96,
+        0
+      ],
+      "id": "00167653-1ac8-4b78-b593-d37344c903be",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "dcf660b6-327c-42bd-aefd-c61e3829c68e",
+              "name": "give_discount",
+              "value": "yes",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        336,
+        -96
+      ],
+      "id": "41c8d539-b294-4151-b7a6-4c0f748733ec",
+      "name": "dicount_yes"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "dcf660b6-327c-42bd-aefd-c61e3829c68e",
+              "name": "give_discount",
+              "value": "no",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        320,
+        112
+      ],
+      "id": "0ea6f836-f9b4-435b-a5bc-9b0e4155e752",
+      "name": "dicount_no"
+    },
+    {
+      "parameters": {
+        "content": "1. Taking feedback from the costumers.\n2. Giving discount to the costumers with the positive feedback.\n3. Save changes to google sheets."
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -352,
+        -176
+      ],
+      "typeVersion": 1,
+      "id": "0b4031a7-0dfe-4265-b255-3db51905682d",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {
+    "On form submission": [
+      {
+        "json": {
+          "Email_ID": "ziq@gmail.com",
+          "Name": "ziqa",
+          "Age": "26",
+          "feedback": "positive",
+          "submittedAt": "2026-06-06T09:44:52.420-04:00",
+          "formMode": "test"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        []
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "dicount_yes",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "dicount_no",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "dicount_yes": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "dicount_no": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "aae01e3c-beb2-4c87-94de-e0f0a7ce0f98",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ac4bc4df3de3d2e4503de40e5f5cbff38bf512b88bf8a6aa90fc94d3cde8a58b"
+  },
+  "nodeGroups": [],
+  "id": "233bz0zzJF4rQHIx",
+  "tags": []
+}

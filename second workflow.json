@@ -1,0 +1,447 @@
+{
+  "name": "second workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "1.Read code from the mail => trigger\n2.Summarize code using LLM.\n3.Generate the comments for the code.\n4. Step 2 and 3 to be done in parallel.\n5. Merge the outputs of step 2 and 3.\n6.Send your output to me as mail.\n",
+        "width": 272
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1024,
+        -320
+      ],
+      "typeVersion": 1,
+      "id": "ce38bcd9-9082-40b5-8ed1-6d50fb5e2363",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": false,
+        "maxResults": 1,
+        "filters": {
+          "sender": "frausara001@gmail.com"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -704,
+        -144
+      ],
+      "id": "bd83510f-edff-4052-a905-3f3fd3094cc6",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "OdK6Nbxrn3MNGUIM",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Given code below\ncode:\n {{ $json.text }}\ngenerate comments for every line so i can understand what it is doing.\nNote: donot modify the code just add the comments where required.",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "you are a helpful assistant and know how to write code in python. you can help me  how to understand the code by adding comments to it."
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        -464,
+        -336
+      ],
+      "id": "bb4abf90-d7ee-498b-89a3-401dce41bc71",
+      "name": "Comments_addition"
+    },
+    {
+      "parameters": {
+        "model": "groq/compound-mini",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -448,
+        -192
+      ],
+      "id": "e0d942d7-a952-43dd-a449-824e281c6a9c",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "h74leJNlmuWfd3Kq",
+          "name": "Groq account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "groq/compound-mini",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -448,
+        64
+      ],
+      "id": "111af691-91c2-49d8-9867-eabe352e4890",
+      "name": "Groq Chat Model1",
+      "credentials": {
+        "groqApi": {
+          "id": "h74leJNlmuWfd3Kq",
+          "name": "Groq account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=given the code below\ncode:\n {{ $json.text }}\ngenerate a summary of what this code in very simple language. Do note that the summary should contain every important details there are in the code is about in a quick glance.",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "You are the expert in python. You have the ability to summarize code in simple language and have the knack to cover important details in summary "
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        -464,
+        -80
+      ],
+      "id": "1afed9c8-eedb-41d9-8096-83e14f6d15ce",
+      "name": "Code_summary"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -144,
+        -176
+      ],
+      "id": "4a59d783-3d85-4341-891b-242f8f8e706a",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {},
+            {
+              "fieldToAggregate": "text"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        48,
+        -176
+      ],
+      "id": "4902063d-eaef-4053-baf9-18982c7e9fce",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "sendTo": "akramsara827@gmail.com",
+        "subject": "comment and summary",
+        "message": "=code with comments:\n{{ $json.text[0] }}\n \ncode with summary:\n{{ $json.text[1] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        736,
+        -224
+      ],
+      "id": "2979066b-4a72-43c3-8cb1-e22a5b879566",
+      "name": "Send a message",
+      "webhookId": "5f49fb20-b2fd-4e4b-be61-605b44e021db",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "OdK6Nbxrn3MNGUIM",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "af1be12b-aa43-419d-a291-fc5aa106baf0",
+              "name": "code with comments:",
+              "value": "={{ $('Comments_addition').item.json.text }}",
+              "type": "string"
+            },
+            {
+              "id": "5cc0a377-85b0-4f6f-b616-6f1f238caefa",
+              "name": "code with summary",
+              "value": "={{ $('Code_summary').item.json.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        192,
+        -192
+      ],
+      "id": "89e4a628-6e6f-4e1a-ab07-88db4db1c7d9",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Convert this message into html format. Include proper code blocks whenever necessary. The code blocks should have syntax highlighting for specific language used in the code\n {{ $('Aggregate').item.json.text }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "you can convert any message into html format that can be sent on mail to the user"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        384,
+        -192
+      ],
+      "id": "f1cea621-26d5-4969-8c97-4a08760c5974",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": "groq/compound-mini",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        384,
+        -32
+      ],
+      "id": "21db1e20-a74e-42ad-95b1-0b196131037a",
+      "name": "Groq Chat Model2",
+      "credentials": {
+        "groqApi": {
+          "id": "h74leJNlmuWfd3Kq",
+          "name": "Groq account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Gmail Trigger": [
+      {
+        "json": {
+          "id": "19e9d94d87966ac0",
+          "threadId": "19e9d947dcc84b9a",
+          "labelIds": [
+            "UNREAD",
+            "IMPORTANT",
+            "SENT",
+            "INBOX"
+          ],
+          "sizeEstimate": 5672,
+          "headers": {
+            "mime-version": "MIME-Version: 1.0",
+            "date": "Date: Sat, 6 Jun 2026 20:37:05 +0500",
+            "message-id": "Message-ID: <CAAuBeXaV9aW56inG9MPoXcnWsg8EoNAtaBVYpQu7ET+uCUO65w@mail.gmail.com>",
+            "subject": "Subject: debugging",
+            "from": "From: sara <frausara001@gmail.com>",
+            "to": "To: sara <frausara001@gmail.com>",
+            "content-type": "Content-Type: multipart/alternative; boundary=\"0000000000007012790653978dc5\""
+          },
+          "html": "<div dir=\"ltr\">/\n\n/ Simulated form submission text data<br>const formSubmission = {<br>    Email_ID: &quot;<a href=\"mailto:ziq@gmail.com\" target=\"_blank\">ziq@gmail.com</a>&quot;,<br>    Name: &quot;ziqa&quot;,<br>    Age: 26,<br>    feedback: &quot;positive&quot;,<br>    submittedAt: &quot;2026-06-06T09:44:52.420-04:00&quot;<br>};<br><br>// 1. Logic to determine discount<br>function processWorkflow(formData) {<br>    let give_discount = &quot;no&quot;;<br>   <br>    // BUG 1: Using a single &#39;=&#39; assigns the value instead of comparing it.<br>    // It will always evaluate to true. Change to &#39;===&#39;<br>    if (formData.feedback = &quot;positive&quot;) {<br>        give_discount = &quot;yes&quot;;<br>    }<br>   <br>    formData.give_discount = give_discount;<br>    return formData;<br>}<br><br>// 2. Simulate saving to Google Sheets<br>function appendToGoogleSheets(data) {<br>    console.log(`[Google Sheets] Successfully appended row for: ${data.Name}`);<br>    return true;<br>}<br><br>// 3. Send text notification to Discord<br>async function sendDiscordNotification(data) {<br>    const webhookUrl = &quot;<a href=\"https://discord.com/api/webhooks/mock_id\" target=\"_blank\">https://discord.com/api/webhooks/mock_id</a>&quot;;<br>   <br>    const messageText = `<br>    🚨 New Form Submission Received! 🚨<br>    Name: ${data.Name}<br>    Feedback: ${data.feedback}<br>    Discount Given: ${data.give_discount}<br>    `;<br><br>    // BUG 2: Discord webhooks expect a JSON object with a &quot;content&quot; key.<br>    // Sending a raw string directly will cause an API error.<br>    // It should be: body: JSON.stringify({ content: messageText })<br>    const response = await fetch(webhookUrl, {<br>        method: &quot;POST&quot;,<br>        headers: { &quot;Content-Type&quot;: &quot;application/json&quot; },<br>        body: messageText<br>    });<br><br>    if (response.ok) {<br>        console.log(&quot;Discord notification sent successfully!&quot;);<br>    } else {<br>        console.log(&quot;Failed to send Discord notification.&quot;);<br>    }<br>}<br><br>// --- Execution ---<br>// BUG 3: Typo in the variable name. &#39;formSubmisison&#39; has &#39;is&#39; swapped.<br>// It will throw a ReferenceError: formSubmisison is not defined.<br>const processedData = processWorkflow(formSubmisison);<br>appendToGoogleSheets(processedData);<br>sendDiscordNotification(processedData);</div>\n",
+          "text": "/ / Simulated form submission text data\nconst formSubmission = {\n    Email_ID: \"ziq@gmail.com\",\n    Name: \"ziqa\",\n    Age: 26,\n    feedback: \"positive\",\n    submittedAt: \"2026-06-06T09:44:52.420-04:00\"\n};\n\n// 1. Logic to determine discount\nfunction processWorkflow(formData) {\n    let give_discount = \"no\";\n\n    // BUG 1: Using a single '=' assigns the value instead of comparing it.\n    // It will always evaluate to true. Change to '==='\n    if (formData.feedback = \"positive\") {\n        give_discount = \"yes\";\n    }\n\n    formData.give_discount = give_discount;\n    return formData;\n}\n\n// 2. Simulate saving to Google Sheets\nfunction appendToGoogleSheets(data) {\n    console.log(`[Google Sheets] Successfully appended row for:\n${data.Name}`);\n    return true;\n}\n\n// 3. Send text notification to Discord\nasync function sendDiscordNotification(data) {\n    const webhookUrl = \"https://discord.com/api/webhooks/mock_id\";\n\n    const messageText = `\n    🚨 New Form Submission Received! 🚨\n    Name: ${data.Name}\n    Feedback: ${data.feedback}\n    Discount Given: ${data.give_discount}\n    `;\n\n    // BUG 2: Discord webhooks expect a JSON object with a \"content\" key.\n    // Sending a raw string directly will cause an API error.\n    // It should be: body: JSON.stringify({ content: messageText })\n    const response = await fetch(webhookUrl, {\n        method: \"POST\",\n        headers: { \"Content-Type\": \"application/json\" },\n        body: messageText\n    });\n\n    if (response.ok) {\n        console.log(\"Discord notification sent successfully!\");\n    } else {\n        console.log(\"Failed to send Discord notification.\");\n    }\n}\n\n// --- Execution ---\n// BUG 3: Typo in the variable name. 'formSubmisison' has 'is' swapped.\n// It will throw a ReferenceError: formSubmisison is not defined.\nconst processedData = processWorkflow(formSubmisison);\nappendToGoogleSheets(processedData);\nsendDiscordNotification(processedData);\n",
+          "textAsHtml": "<p>/ / Simulated form submission text data<br/>const formSubmission = {<br/>    Email_ID: &quot;<a href=\"mailto:ziq@gmail.com\">ziq@gmail.com</a>&quot;,<br/>    Name: &quot;ziqa&quot;,<br/>    Age: 26,<br/>    feedback: &quot;positive&quot;,<br/>    submittedAt: &quot;2026-06-06T09:44:52.420-04:00&quot;<br/>};</p><p>// 1. Logic to determine discount<br/>function processWorkflow(formData) {<br/>    let give_discount = &quot;no&quot;;</p><p>    // BUG 1: Using a single &apos;=&apos; assigns the value instead of comparing it.<br/>    // It will always evaluate to true. Change to &apos;===&apos;<br/>    if (<a href=\"http://formData.feedback\">formData.feedback</a> = &quot;positive&quot;) {<br/>        give_discount = &quot;yes&quot;;<br/>    }</p><p>    formData.give_discount = give_discount;<br/>    return formData;<br/>}</p><p>// 2. Simulate saving to Google Sheets<br/>function appendToGoogleSheets(data) {<br/>    console.log(&grave;[Google Sheets] Successfully appended row for:<br/>${<a href=\"http://data.Name\">data.Name</a>}&grave;);<br/>    return true;<br/>}</p><p>// 3. Send text notification to Discord<br/>async function sendDiscordNotification(data) {<br/>    const webhookUrl = &quot;<a href=\"https://discord.com/api/webhooks/mock_id\">https://discord.com/api/webhooks/mock_id</a>&quot;;</p><p>    const messageText = &grave;<br/>    &#x1F6A8; New Form Submission Received! &#x1F6A8;<br/>    Name: ${<a href=\"http://data.Name\">data.Name</a>}<br/>    Feedback: ${<a href=\"http://data.feedback\">data.feedback</a>}<br/>    Discount Given: ${data.give_discount}<br/>    &grave;;</p><p>    // BUG 2: Discord webhooks expect a JSON object with a &quot;content&quot; key.<br/>    // Sending a raw string directly will cause an API error.<br/>    // It should be: body: JSON.stringify({ content: messageText })<br/>    const response = await fetch(webhookUrl, {<br/>        method: &quot;POST&quot;,<br/>        headers: { &quot;Content-Type&quot;: &quot;application/json&quot; },<br/>        body: messageText<br/>    });</p><p>    if (response.ok) {<br/>        console.log(&quot;Discord notification sent successfully!&quot;);<br/>    } else {<br/>        console.log(&quot;Failed to send Discord notification.&quot;);<br/>    }<br/>}</p><p>// --- Execution ---<br/>// BUG 3: Typo in the variable name. &apos;formSubmisison&apos; has &apos;is&apos; swapped.<br/>// It will throw a ReferenceError: formSubmisison is not defined.<br/>const processedData = processWorkflow(formSubmisison);<br/>appendToGoogleSheets(processedData);<br/>sendDiscordNotification(processedData);</p>",
+          "subject": "debugging",
+          "date": "2026-06-06T15:37:05.000Z",
+          "to": {
+            "value": [
+              {
+                "address": "frausara001@gmail.com",
+                "name": "sara"
+              }
+            ],
+            "html": "<span class=\"mp_address_group\"><span class=\"mp_address_name\">sara</span> &lt;<a href=\"mailto:frausara001@gmail.com\" class=\"mp_address_email\">frausara001@gmail.com</a>&gt;</span>",
+            "text": "\"sara\" <frausara001@gmail.com>"
+          },
+          "from": {
+            "value": [
+              {
+                "address": "frausara001@gmail.com",
+                "name": "sara"
+              }
+            ],
+            "html": "<span class=\"mp_address_group\"><span class=\"mp_address_name\">sara</span> &lt;<a href=\"mailto:frausara001@gmail.com\" class=\"mp_address_email\">frausara001@gmail.com</a>&gt;</span>",
+            "text": "\"sara\" <frausara001@gmail.com>"
+          },
+          "messageId": "<CAAuBeXaV9aW56inG9MPoXcnWsg8EoNAtaBVYpQu7ET+uCUO65w@mail.gmail.com>"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Comments_addition",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Code_summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Comments_addition": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Code_summary",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Comments_addition",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code_summary": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        []
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "a2314bc9-2dd1-4e4d-9917-3488ae6b9134",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ac4bc4df3de3d2e4503de40e5f5cbff38bf512b88bf8a6aa90fc94d3cde8a58b"
+  },
+  "nodeGroups": [],
+  "id": "ZzipDXtmRMDy23QI",
+  "tags": []
+}
