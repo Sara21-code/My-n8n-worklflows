@@ -21,4 +21,3 @@ My third Workflow:
 
 
 ---
-*Note: Make sure to configure your own credentials and API tokens inside n8n before importing these workflows.*
